@@ -2,7 +2,6 @@
 """
 Created on Sat Jul  4 16:26:16 2020
 
-@author: Sarojini
 """
 
 # -*- coding: utf-8 -*-
@@ -71,10 +70,8 @@ def faceMonitering():
             print('Fail')
             retval =False
         #cv2.imwrite('tej_web.jpg', img)
-            
-        
+  
     return jsonify(retval)
-        
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, port=5000)
