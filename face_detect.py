@@ -63,15 +63,20 @@ def faceMonitering():
         if(np.size(faces) == 0):
             print('Fail')
             retval =False
+            errormsg = 'No Person Available'
         elif(faces.shape[0] < 2):
             print('Success')
             retval = True
+            errormsg = 'Success'
         else:
             print('Fail')
             retval =False
+            errormsg = 'More Than One Person Available'
         #cv2.imwrite('tej_web.jpg', img)
-  
-    return jsonify(retval)
+            
+        
+    return jsonify({"error": errormsg, "valid": retval})
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, port=5000)
