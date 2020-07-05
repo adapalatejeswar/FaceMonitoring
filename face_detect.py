@@ -31,12 +31,16 @@ w, h = template.shape[::-1]
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
+first = True
+clip_face = []
 
 @app.route('/faceMonitering', methods=['GET', 'POST'])
 #@cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
 @cross_origin(origin='http://localhost:4200',headers=['Content-Type','Access-Control-Allow-Origin'])
 #@cross_origin()
 def faceMonitering():
+    global first
+    global clip_face
     if request.method == 'POST':
         #  read encoded image
         #print(request.json)
@@ -55,19 +59,34 @@ def faceMonitering():
 #        cv2.destroyAllWindows()
         gray_frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(
-                                            gray_frame,
-                                            scaleFactor=1.1,
-                                            minNeighbors=5,
-                                            minSize=(30, 30),
-                                            )
+            gray_frame,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+        )
+        
+        if(np.size(faces) > 0):
+            if(first == True):
+                x,y,h,w = faces[0]
+                clip_face = gray_frame[y:y+h, x:x+w]
+                cv2.imwrite("detected-boxes.jpg", clip_face)
+                first = False
+        
+        res = cv2.matchTemplate(gray_frame, clip_face, cv2.TM_CCOEFF_NORMED)
+        loc = np.where(res >= 0.7)
+        
         if(np.size(faces) == 0):
             print('Fail')
             retval =False
             errormsg = 'No Person Available'
-        elif(faces.shape[0] < 2):
+        elif(faces.shape[0] == 1):
             print('Success')
-            retval = True
-            errormsg = 'Success'
+            if(np.size(loc) > 0):
+                retval = True
+                errormsg = 'Success'
+            else:
+                retval =False
+                errormsg = 'Not the same person'
         else:
             print('Fail')
             retval =False
