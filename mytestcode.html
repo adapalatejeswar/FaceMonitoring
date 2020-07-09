@@ -39,7 +39,7 @@
     }
 
     function startRecording(stream, lengthInMS) {
-        let recorder = new MediaRecorder(stream);
+        let recorder = new MediaRecorder(stream, {miniType:'video/mp4; codecs=h264'});
         let data = [];
 
         recorder.ondataavailable = event => data.push(event.data);
@@ -70,17 +70,17 @@
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false
-        }).then(stream => {
+        }).then(stream => {   
                 preview.srcObject = stream;
                 downloadButton.href = stream;
                 preview.captureStream = preview.captureStream || preview.mozCaptureStream;
                 return new Promise(resolve => preview.onplaying = resolve);
               }).then(() => startRecording(preview.captureStream(), recordingTimeMS))
               .then (recordedChunks => {
-                let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+                let recordedBlob = new Blob(recordedChunks, { type: "video/mp4" });
                 recording.src = URL.createObjectURL(recordedBlob);  
                 downloadButton.href = recording.src;
-                downloadButton.download = "RecordedVideo.webm";
+                downloadButton.download = "RecordedVideo.mp4";
 
                 log("Successfully recorded " + recordedBlob.size + " bytes of " +
                     recordedBlob.type + " media.");
