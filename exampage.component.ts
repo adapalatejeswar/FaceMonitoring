@@ -51,6 +51,27 @@ export class ExampageComponent implements OnInit {
       }).then(()=>{
        this.postcontinue();
       });
+
+    //   navigator.mediaDevices.getUserMedia({
+    //     video: true,
+    //     audio: false
+    // }).then(stream => {   
+    //         preview.srcObject = stream;
+    //         //downloadButton.href = stream;
+    //         preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+    //         return new Promise(resolve => preview.onplaying = resolve);
+    //       }).then(() => startRecording(preview.captureStream(), recordingTimeMS))
+    //       .then (recordedChunks => {
+    //         let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+    //         recording.src = URL.createObjectURL(recordedBlob);  
+    //         //downloadButton.href = recording.src;
+    //        // downloadButton.download = "RecordedVideo.webm";
+
+    //         log("Successfully recorded " + recordedBlob.size + " bytes of " +
+    //             recordedBlob.type + " media.");
+    //       })
+    //       .catch(log);
+
     
 }
 
@@ -61,23 +82,20 @@ public postcontinue(): void{
       let headers = new HttpHeaders({
       'Content-Type':  'application/json'
       });
-    this.http.post("http://localhost:5000/faceMonitering", { img: this.webcamImage.imageAsBase64 }, {headers }).subscribe((res:any) => {
+    this.http.post("http://localhost:5000/videoRecording", { img: this.webcamImage.imageAsBase64 }, {headers }).subscribe((res:any) => {
     //this.loginResponse = JSON.stringify(res)
       //  alert(this.loginResponse);  
-      if (res.valid === false){
-        alert(res.error);
-      }
+      // if (res.valid === false){
+      //   alert(res.error);
+      // }
       console.log(res);
-    })}, 5000); // currently interval is set for every 5 seconds.
-};
-
+    })}, 125); // currently interval is set for every 5 seconds.
+  };
+  
 public handleInitError(error: WebcamInitError): void {
   this.errors.push(error);
 }
-    
- 
-    
-  
+
 public get triggerObservable(): Observable<void> {
       return this.trigger.asObservable();
     } 
@@ -85,9 +103,23 @@ public get triggerObservable(): Observable<void> {
 // 4 added new for monitoring - ends//
 
 completeExam(){
+  console.log('in the complete')
   clearInterval(this.intervalHandle);
+  this.trigger.next();
+      let headers = new HttpHeaders({
+      'Content-Type':  'application/json'
+      });
+    this.http.post("http://localhost:5000/videoRecordingClose", { img: this.webcamImage.imageAsBase64 }, {headers }).subscribe((res:any) => {
+    //this.loginResponse = JSON.stringify(res)
+      //  alert(this.loginResponse);  
+      if (res.valid === false){
+        alert(res.error);
+      }
+      console.log(res);
+    });
+  
   this.router.navigate(['examcomplete']);
-
-
   }
+
+ 
 }
